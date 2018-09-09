@@ -27,7 +27,10 @@
             </p>
             <div style="width:100%">
               <form action="./" method="get">
-                <input type="text" name="sfen" placeholder="sfen"></input>
+                <input type="text" name="sfen" placeholder="局面情報入力"></input>
+                <input type="text" name="lmv" placeholder="最終手"></input>
+                <input type="text" name="eval" placeholder="評価値"></input>
+                <p><label><input type="checkbox" name="type"><span>先後反転する</span></label></input></p>
                 <input type="submit" class="btn" value="局面図作成"></input>
               </form>
             </div>
@@ -47,7 +50,7 @@
           <input type="text" id="urlcode"></input>
 <script>
 $(document).ready(function() {
-    document.getElementById("urlcode").value = '<img src="https://shogi.mydns.jp/sfen.php'+location.search+'"/>';
+    document.getElementById("urlcode").value = '<img src="https://shogi.mydns.jp/canvas/sfen.php'+location.search+'"/>';
 });
           </script>
         </div>
@@ -60,9 +63,16 @@ $(document).ready(function() {
 if(is_Null($_GET["sfen"])){
     $url = "https://shogi.mydns.jp/sfen.php?sfen=lnsgkgsnl%2F1r5b1%2Fppppppppp%2F9%2F9%2F9%2FPPPPPPPPP%2F1B5R1%2FLNSGKGSNL+b+-+1";
 }else{
-    $url = "https://shogi.mydns.jp/sfen.php?sfen=".urlencode($_GET['sfen']);
+    $array = array(
+        'sfen' => $_GET['sfen'],
+        'type' => $_GET['type'],
+        'lmv' => $_GET['lmv'],
+        'eval' => $_GET['eval']);
+    $param = http_build_query($array);
+    $url = "https://shogi.mydns.jp/canvas/sfen.php?".$param;
 }
-echo("<img src=".$url."\" width=\"30%\">");
+$str = "<img src=\"".$url."\">";
+echo($str);
 ?>
     </div>
   </body>

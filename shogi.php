@@ -1,8 +1,9 @@
 <?php
 class Board{
-    public function __construct(){
+    public function __construct($type=False){
+        $this->type = $type;
         $this->xml = new SimpleXMLElement('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="550"></svg>');
-        $this->addBoard();    
+        $this->addBoard();
     }
 
 
@@ -16,8 +17,11 @@ class Board{
         $rect->addAttribute('fill', 'none');
         $rect->addAttribute('stroke-width', '3');
         $rect->addAttribute('stroke', '#000000');
+
         $text_n = array("１", "２", "３", "４", "５", "６", "７", "８", "９");
+        !$this->type ? $text_n = $text_n : $text_n = array_reverse($text_n);
         $text_k = array("一", "二", "三", "四", "五", "六", "七", "八", "九");
+        !$this->type ? noap : $text_k = array_reverse($text_k);
 
         // 盤の文字とかを書く
         for($i=0; $i<9; $i++){
@@ -133,25 +137,33 @@ class Board{
             $black->addAttribute('font-family', '游明朝');
             $black->addAttribute('text-anchor', 'middle');
         }
-        if($player == 1){
+        if($player == True){
             $pos = ($key-strlen($this->black))*(32+1/7)*(-1);
             $poly = $b->addChild('polygon');
             $point = "0,".($pos-65)." 11.5,".($pos-60)." 15,".($pos-35)." -15,".($pos-35)." -11.5,".($pos-60);
             $poly->addAttribute('points', $point);
+            if($this->type){
+                $poly->addAttribute('fill', 'none');
+                $poly->addAttribute('stroke', '#000000');
+                $poly->addAttribute('stroke-width', 2);
+            }
         }else{
             $pos = ($key-strlen($this->white))*(32+1/7)*(-1);
             $poly = $b->addChild('polygon');
             $point = "0,".($pos-65)." 11.5,".($pos-60)." 15,".($pos-35)." -15,".($pos-35)." -11.5,".($pos-60);
             $poly->addAttribute('points', $point);
-            $poly->addAttribute('fill', 'none');
-            $poly->addAttribute('stroke', '#000000');
-            $poly->addAttribute('stroke-width', 2);
+            if(!$this->type){
+                $poly->addAttribute('fill', 'none');
+                $poly->addAttribute('stroke', '#000000');
+                $poly->addAttribute('stroke-width', 2);
+            }
         }
     }
     
     
     // 盤面に駒を表示する関数
     public function AddPiece($pieces){
+        $pb = $this->xml->addChild('g');
         foreach($pieces as $m => $line){
             foreach($line as $n => $p){
                 if(!empty($p)){
@@ -203,10 +215,11 @@ class Board{
                         $text = "あ";
                         break;
                     }
-                    $g = $this->xml->addChild('g');
+                    $g = $pb->addChild('g');
                     // 小文字なら相手の駒なので反転させる
                     // 成り駒だと記号が入っていて正しく判定できないので最後の文字だけ見る処理を入れてある
-                    if(ctype_lower($p[strlen($p) - 1])){
+
+                    if($this->type xor ctype_lower($p[strlen($p) - 1])){
                         // ここの書き方がダサいので誰か改善案求む
                         $trans = "translate(".(87.5+50*$n).",".(62.5+50*$m).") scale(-1, -1)";
                     }else{
@@ -220,7 +233,7 @@ class Board{
                     $piece->addAttribute('dy', '16');
                     $piece->addAttribute('font-size', '41');
                     // 最終手の強調表示
-                    if(10*(9-$n)+($m+1) == $this->lastmove){
+                    if(10*(9-$n)+($m+1) == $this->lmv){
                         $piece->addAttribute('font-family', 'YuGothicB');
                         $piece->addAttribute('font-weight', 'bold');
                     }else{
@@ -244,7 +257,7 @@ class Board{
     // 評価値情報を載せている
     public function addEval($eval){
         $board = $this->xml->addChild('g');
-        $text = "評価値 ".substr($eval,0, -1);
+        $text = "評価値 ".$eval;
         $eval = $board->addChild('text', $text);
         $eval->addattribute('x', '62');
         $eval->addattribute('y', 520);
@@ -253,19 +266,18 @@ class Board{
     }
 
     // Sfen形式のデータを読み込む関数
-    public function loadSfen($sfen){
-        $board = array();
-        $move = explode(" ", $sfen);
+    public function loadSfen($sfen, $lmv, $eval){
         
-        // 対局情報を取得
-        $this->turn = $move[1];
-        $this->count = $move[3];
-        $this->lastmove = $move[4];
-        $this->eval = $move[5];
+        // 盤面の駒情報を保存
+        $board = array();
+        $this->type ? $this->lmv = 110 - $lmv: $this->lmv = $lmv;
+
+        $move = explode(" ", $sfen);
         
         // 持ち駒情報を保存
         $this->black = array("先", "手", " ");
         $this->white = array("後", "手", " ");
+
         
         // 持ち駒の数を数えるんだけど、関数がダサい
         foreach(str_split($move[2]) as $piece){
@@ -310,18 +322,17 @@ class Board{
                 }
             }
             if($val === "/"){
-                array_push($board, $line);
+                !$this->type ? array_push($board, $line) : array_unshift($board, array_reverse($line));
                 $line = array();
             }
         }
-        array_push($board, $line);
+        !$this->type ? array_push($board, $line) : array_unshift($board, array_reverse($line));
+
         $this->addPiece($board);
-        $this->addCapturePiece($this->black, 1);
-        $this->addCapturePiece($this->white, 0);
+        $this->addCapturePiece($this->black, !$this->type);
+        $this->addCapturePiece($this->white, $this->type);
         
         // 評価値情報があれば表示する
-        if(!is_Null($this->eval)){
-            $this->addEval($this->eval);
-        }
+        !empty($eval) ? $this->addEval($eval) : nope;
     }
 }
