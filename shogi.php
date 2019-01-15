@@ -126,6 +126,18 @@ class Board{
             case "手":
                 $text = "手";
                 break;
+            case "残":
+                $text = "残";
+                break;
+            case "り":
+                $text = "り";
+                break;
+            case "全":
+                $text = "全";
+                break;
+            case "部":
+                $text = "部";
+                break;
             case " ":
                 $text = " ";
                 break;
@@ -266,7 +278,7 @@ class Board{
     }
 
     // Sfen形式のデータを読み込む関数
-    public function loadSfen($sfen, $lmv, $eval){
+    public function loadSfen($sfen, $lmv, $eval, $tsume){
         
         // 盤面の駒情報を保存
         $board = array();
@@ -278,7 +290,6 @@ class Board{
         $this->black = array("先", "手", " ");
         $this->white = array("後", "手", " ");
 
-        
         // 持ち駒の数を数えるんだけど、関数がダサい
         foreach(str_split($move[2]) as $piece){
             if(is_numeric($piece)){
@@ -298,6 +309,10 @@ class Board{
                     $num = 0;
                 }
             }
+        }
+
+        if($tsume == True){
+            $this->white = array("後", "手", " ", "残", "り", "全", "部");
         }
 
         // 盤面を9x9の配列情報として保存していく

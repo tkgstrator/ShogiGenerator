@@ -22,7 +22,7 @@
               <br>
               <br>
             </h1>
-            <p class="lead">SFEN形式の局面データからSVG形式で盤面図を生成するウェブサービスです.SVG形式はPNG形式とは違い,ベクター画像なのでどれだけ拡大縮小しても画質が荒くならない利点があります.
+            <p class="lead">SFEN形式の局面データからSVG形式で盤面図を生成するウェブサービスです.
             <br>
             </p>
             <div style="width:100%">
@@ -34,43 +34,17 @@
                 <input type="submit" class="btn" value="局面図作成"></input>
               </form>
             </div>
-            <script>
-            var clipboard = new ClipboardJS('.btn');
-            clipboard.on('success', function(e) {
-                console.log(e);
-            });
-            clipboard.on('error', function(e) {
-                console.log(e);
-            });
-            </script>
-            <button class="btn copy" data-clipboard-target="#urlcode">埋め込みコードをコピー</button>
           </div>
-        </div>
-        <div class="row">
-          <input type="text" id="urlcode"></input>
-<script>
-$(document).ready(function() {
-    document.getElementById("urlcode").value = '<img src="https://shogi.mydns.jp/canvas/sfen.php'+location.search+'"/>';
-});
-          </script>
-        </div>
-        <div class="ref">
-          <p class="lead"><a href="http://www.geocities.jp/ookami_maasa/shogizumen/">shogizumen.js</a>
-          <p class="lead"><a href="https://shogi.zukeran.org/shogi-draw/">将棋局面図の画像作成(SVG,PNG)</a>
         </div>
       </div>
 <?php
-if(is_Null($_GET["sfen"])){
-    $url = "https://shogi.mydns.jp/sfen.php?sfen=lnsgkgsnl%2F1r5b1%2Fppppppppp%2F9%2F9%2F9%2FPPPPPPPPP%2F1B5R1%2FLNSGKGSNL+b+-+1";
-}else{
     $array = array(
         'sfen' => $_GET['sfen'],
         'type' => $_GET['type'],
         'lmv' => $_GET['lmv'],
         'eval' => $_GET['eval']);
     $param = http_build_query($array);
-    $url = "https://shogi.mydns.jp/canvas/sfen.php?".$param;
-}
+    $url = "https://shogi.mydns.jp/sfen?".$param;
 $str = "<img src=\"".$url."\">";
 echo($str);
 ?>

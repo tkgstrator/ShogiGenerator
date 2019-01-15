@@ -1,7 +1,9 @@
 <?php
 require "./shogi.php";
 
-$board = new Board($_GET['type'] == "on" ? True : False);
-$board->loadSfen($_GET['sfen'], $_GET['lmv'], $_GET['eval']);
+session_start();
+
+$board = new Board($_SESSION['type'] == "on" ? True : False);
+$board->loadSfen($_SESSION['sfen'], $_SESSION['lmv'], $_SESSION['eval'], $SESSION['tsume']);
 $board->View();
 ?>
