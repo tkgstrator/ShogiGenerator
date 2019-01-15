@@ -26,11 +26,13 @@
             <br>
             </p>
             <div style="width:100%">
-              <form action="./" method="get">
+              <form action="./" method="post">
                 <input type="text" name="sfen" placeholder="局面情報入力"></input>
                 <input type="text" name="lmv" placeholder="最終手"></input>
                 <input type="text" name="eval" placeholder="評価値"></input>
-                <p><label><input type="checkbox" name="type"><span>先後反転する</span></label></input></p>
+                <p>
+                    <label><input type="checkbox" name="type"><span>先後反転する</span></label></input>
+                    <label><input type="checkbox" name="tsume"><span>詰将棋</span></label></input></p>
                 <input type="submit" class="btn" value="局面図作成"></input>
               </form>
             </div>
@@ -38,14 +40,24 @@
         </div>
       </div>
 <?php
-    $array = array(
-        'sfen' => $_GET['sfen'],
-        'type' => $_GET['type'],
-        'lmv' => $_GET['lmv'],
-        'eval' => $_GET['eval']);
-    $param = http_build_query($array);
-    $url = "https://shogi.mydns.jp/sfen?".$param;
-$str = "<img src=\"".$url."\">";
+session_start();
+
+$_SESSION['sfen'] = !empty($_POST['sfen']) ? $_POST['sfen'] : "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1";
+$_SESSION['type'] = !empty($_POST['type']) ? $_POST['type'] : noap;
+$_SESSION['lmv'] = !empty($_POST['lmv']) ? $_POST['lmv'] : noap;
+$_SESSION['eval'] = !empty($_POST['eval']) ? $_POST['eval'] : "";
+$_SESSION['tsume'] = !empty($_POST['tsume']) ? $_POST['tsume'] == "on" ? True : False : False;
+
+$array = array(
+    'sfen' => $_SESSION['sfen'],
+    'type' => $_SESSION['type'],
+    'lmv' => $_SESSION['lmv'],
+    'eval' => $_SESSION['eval'],
+    'tsume' => $_SESSION['tsume'],
+);
+$param = http_build_query($array);
+$url = "https://shogi.mydns.jp/board?".$param;
+$str = "<img src=\"".$url."\" width=\"40%\">";
 echo($str);
 ?>
     </div>

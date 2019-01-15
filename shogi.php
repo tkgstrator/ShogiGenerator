@@ -224,7 +224,6 @@ class Board{
                         $text = "全";
                         break;
                     default:
-                        $text = "あ";
                         break;
                     }
                     $g = $pb->addChild('g');
@@ -279,7 +278,6 @@ class Board{
 
     // Sfen形式のデータを読み込む関数
     public function loadSfen($sfen, $lmv, $eval, $tsume){
-        
         // 盤面の駒情報を保存
         $board = array();
         $this->type ? $this->lmv = 110 - $lmv: $this->lmv = $lmv;
