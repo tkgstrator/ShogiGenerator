@@ -39,7 +39,7 @@ class Board{
         $board->addAttribute('x', $x);
         $board->addAttribute('y', $y);
         $board->addAttribute('font-size', '20');
-        $board->addAttribute('font-family', '游明朝');
+        $board->addAttribute('font-family', 'Yu Mincho');
         $board->addAttribute('text-anchor', 'middle');
     }
     
@@ -146,7 +146,7 @@ class Board{
             $black->addAttribute('x', '0');
             $black->addAttribute('y', ($key-strlen($this->black))*(32+1/7)*(-1));
             $black->addAttribute('font-size', 32+1/7);
-            $black->addAttribute('font-family', '游明朝');
+            $black->addAttribute('font-family', 'Yu Mincho');
             $black->addAttribute('text-anchor', 'middle');
         }
         if($player == True){
@@ -245,10 +245,10 @@ class Board{
                     $piece->addAttribute('font-size', '41');
                     // 最終手の強調表示
                     if(10*(9-$n)+($m+1) == $this->lmv){
-                        $piece->addAttribute('font-family', 'YuGothicB');
+                        $piece->addAttribute('font-family', 'Yu Gothic');
                         $piece->addAttribute('font-weight', 'bold');
                     }else{
-                        $piece->addAttribute('font-family', '游明朝');
+                        $piece->addAttribute('font-family', 'Yu Mincho');
                     }
                     $piece->addAttribute('text-anchor', 'middle');
                 }
@@ -273,7 +273,7 @@ class Board{
         $eval->addattribute('x', '62');
         $eval->addattribute('y', 520);
         $eval->addattribute('font-size', 28);
-        $eval->addAttribute('font-family', '游明朝');
+        $eval->addAttribute('font-family', 'Yu Mincho');
     }
 
     // Sfen形式のデータを読み込む関数
@@ -346,6 +346,6 @@ class Board{
         $this->addCapturePiece($this->white, $this->type);
         
         // 評価値情報があれば表示する
-        !empty($eval) ? $this->addEval($eval) : nope;
+        !empty($eval) ? $this->addEval($eval) : noap;
     }
 }
