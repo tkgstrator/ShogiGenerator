@@ -3,10 +3,9 @@
 // mb_regex_encoding("UTF-8");
 
 class Board{
-    public function __construct($url){
+    public function __construct(){
         $this->board = array_fill(0, 81, "-");
         $this->setPieces();
-        $this->loadSfen($url);
     }
 
     public function setPieces(){
@@ -27,9 +26,8 @@ class Board{
     }
 
     // KIFデータを整形する関数
-    public function loadSfen($url) {
+    public function loadKif($url) {
         $kif = explode("\n", mb_convert_encoding(file_get_contents($url), "utf-8", "sjis"));
-
         foreach($kif as $value) {
             // コメントは無視
             if(strpos($value, '*') === false) {
@@ -54,7 +52,17 @@ class Board{
         }
     }
 
-    public function moveSfen($num){
+    public function PseudoSfen(){
+        $json = array(
+            "black" => "black",
+            "white" => "white",
+            "moves" => $this->sfen,
+        );
+        header("Content-Type: application/json; charset=utf-8");
+        echo json_encode($json);
+    }
+
+    public function moveSfen($turn = 256){
         foreach($this->sfen as $key => $move) {
             // 数字が4つあれば駒台から打った駒ではない
             if(strlen(preg_replace("/[^1-9]+/u", "", $move)) == 4){
@@ -104,11 +112,14 @@ class Board{
                 }
             }
             // echo "Turn:".($key + 1).$bpos." to ".$apos."\n";
-            if($key >= $num - 1) break;
+            if($key >= $turn - 1) break;
         }
     }
 
-    public function exportSfen() {
+    public function export($turn) {
+        // 指定手数まで動かす
+        $this->moveSfen($turn);
+
         $sfen = "";
         $empty = 0;
         foreach($this->board as $key => $value) {
@@ -155,14 +166,7 @@ class Board{
                 $sfen .= strtolower($keys[$key]);
             }
         }
-        echo $sfen;
-    }
-
-    // N手目の局面をSfen形式で返す
-    // -1を入れると最新のものが返る
-    public function exportBoard($num) {
-        header("Content-Type: application/json; charset=utf-8");
-        $this->moveSfen($num);
+        return $sfen;
     }
 
     private $table = array(
@@ -229,7 +233,7 @@ class Board{
         "L" => 0,
         "P" => 0,
     );
-
+    
     private $sfen = array();
 }
 ?>
